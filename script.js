@@ -1,65 +1,68 @@
 let jogadores = [];
-let nomeAtual = 0;
-let historia = [];
+let etapa = 0;
 
-document.addEventListener("DOMContentLoaded", () => {
-  addToStory("🤖 Narrador: Bem-vindos à *Noite de Mistério*. A escuridão se aproxima, e as sombras ganham vida... Mas antes de revelarmos os segredos ocultos desta noite, diga-me... Qual o seu nome, viajante?");
-});
+const form = document.getElementById("input-form");
+const input1 = document.getElementById("input1");
+const input2 = document.getElementById("input2");
+const story = document.getElementById("story");
 
-document.getElementById("name-form").addEventListener("submit", function (e) {
+addToStory("🤖 Narrador: Bem-vindos à *Noite de Mistério*. A escuridão se aproxima, e as sombras ganham vida... Mas antes de revelarmos os segredos ocultos desta noite, diga-me... Qual o seu nome, viajante?");
+
+form.addEventListener("submit", async function (e) {
   e.preventDefault();
-  const input = document.getElementById("name-input");
-  const nome = input.value.trim();
-  if (!nome) return;
+  const v1 = input1.value.trim();
+  const v2 = input2.value.trim();
 
-  jogadores.push(nome);
-  addToStory(`🧍 ${nome}: ${nome}`);
-  input.value = "";
+  if (etapa === 0 && v1) {
+    jogadores.push(v1);
+    addToStory(`🧍 ${v1}: ${v1}`);
+    input1.value = "";
+    input1.placeholder = "Jogador 2";
+    etapa = 1;
+    addToStory(`🤖 Narrador: Muito bem, ${jogadores[0]}. E quem é essa figura misteriosa ao seu lado? Diga-me, qual o seu nome?`);
+    return;
+  }
 
-  if (jogadores.length === 1) {
-    addToStory(`🤖 Narrador: Muito bem, ${nome}. E quem é essa figura misteriosa ao seu lado? Diga-me, qual o seu nome?`);
-  } else if (jogadores.length === 2) {
+  if (etapa === 1 && v1) {
+    jogadores.push(v1);
+    addToStory(`🧍 ${v1}: ${v1}`);
+    input1.style.display = "none";
+    input2.style.display = "inline-block";
+    input1.placeholder = `👤 ${jogadores[0]}`;
+    input2.placeholder = `👤 ${jogadores[1]}`;
+    etapa = 2;
     addToStory(`🤖 Narrador: ${jogadores[0]} e ${jogadores[1]}, o jogo começou... Sigam suas intuições. Há algo escondido nas sombras desta noite.`);
-    document.getElementById("name-form").style.display = "none";
-    document.getElementById("input-form").style.display = "flex";
-    document.getElementById("input1").placeholder = `${jogadores[0]}`;
-    document.getElementById("input2").placeholder = `${jogadores[1]}`;
-  }
-});
-
-document.getElementById("input-form").addEventListener("submit", async function (e) {
-  e.preventDefault();
-  const input1 = document.getElementById("input1");
-  const input2 = document.getElementById("input2");
-  const msg1 = input1.value.trim();
-  const msg2 = input2.value.trim();
-  if (!msg1 && !msg2) return;
-
-  if (msg1) {
-    addToStory(`🧍 ${jogadores[0]}: ${msg1}`);
-    historia.push({ role: "user", content: `${jogadores[0]}: ${msg1}` });
-  }
-  if (msg2) {
-    addToStory(`🧍 ${jogadores[1]}: ${msg2}`);
-    historia.push({ role: "user", content: `${jogadores[1]}: ${msg2}` });
+    return;
   }
 
-  input1.value = "";
-  input2.value = "";
+  if (etapa >= 2) {
+    const msg1 = input1.value.trim();
+    const msg2 = input2.value.trim();
+    if (!msg1 && !msg2) return;
 
-  const response = await fetch("https://misterio.onrender.com/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: historia })
-  });
+    if (msg1) addToStory(`🧍 ${jogadores[0]}: ${msg1}`);
+    if (msg2) addToStory(`🧍 ${jogadores[1]}: ${msg2}`);
 
-  const data = await response.json();
-  historia.push({ role: "assistant", content: data.reply });
-  addToStory(`🤖 Narrador: ${data.reply}`);
+    input1.value = "";
+    input2.value = "";
+
+    const response = await fetch("https://misterio.onrender.com/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jogador1: jogadores[0],
+        jogador2: jogadores[1],
+        mensagem1: msg1,
+        mensagem2: msg2
+      })
+    });
+
+    const data = await response.json();
+    addToStory(`🤖 Narrador: ${data.reply}`);
+  }
 });
 
 function addToStory(texto) {
-  const story = document.getElementById("story");
-  story.innerHTML += `<p>${texto}</p>`;
+  story.innerHTML += texto + "\n\n";
   story.scrollTop = story.scrollHeight;
 }
