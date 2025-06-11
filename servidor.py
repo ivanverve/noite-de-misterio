@@ -1,32 +1,37 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import openai
+import os
+
+app = Flask(__name__)
+CORS(app)
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 @app.route("/api/chat", methods=["POST"])
 def chat():
-    data = request.json
-    jogadores = data.get("jogadores", ["Jogador 1", "Jogador 2"])
-    mensagens = data.get("mensagens", [])
+    dados = request.get_json()
+    mensagem = dados.get("mensagem")
 
-    prompt = (
-        f"Você é um narrador de um jogo de mistério psicológico, sensual, interativo e envolvente. "
-        f"Os jogadores são {jogadores[0]} e {jogadores[1]}. "
-        f"A história deve avançar a cada turno considerando as ações combinadas dos dois. "
-        f"Responda como o narrador, em tom imersivo, em terceira pessoa, guiando-os com suspense. "
-        f"Aqui estão as ações mais recentes:\n"
-    )
+    if not mensagem:
+        return jsonify({"resposta": "Nenhuma mensagem recebida."}), 400
 
-    for msg in mensagens:
-        prompt += f"{msg['jogador']}: {msg['mensagem']}\n"
+    try:
+        resposta = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Você é o narrador de um jogo de mistério. Responda sempre como se estivesse narrando um RPG sombrio e envolvente."},
+                {"role": "user", "content": mensagem}
+            ],
+            max_tokens=500,
+            temperature=0.9
+        )
 
-    response = requests.post(
-        "https://api.openai.com/v1/chat/completions",
-        headers={
-            "Authorization": f"Bearer {OPENAI_API_KEY}",
-            "Content-Type": "application/json",
-        },
-        json={
-            "model": "gpt-4o",
-            "messages": [{"role": "system", "content": prompt}],
-            "temperature": 0.85,
-        },
-    )
+        mensagem_resposta = resposta.choices[0].message.content.strip()
+        return jsonify({"resposta": mensagem_resposta})
 
-    result = response.json()
-    return jsonify({"reply": result["choices"][0]["message"]["content"]})
+    except Exception as e:
+        return jsonify({"resposta": f"Erro: {str(e)}"}), 500
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
