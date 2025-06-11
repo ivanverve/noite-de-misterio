@@ -1,26 +1,28 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Noite de Mistério</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="container">
     <h1>Noite de Mistério</h1>
     <div id="story"></div>
-    <form id="name-form">
-      <input type="text" id="name1" placeholder="Nome do Jogador 1" required />
-      <input type="text" id="name2" placeholder="Nome do Jogador 2" required />
-      <button type="submit">Começar</button>
-    </form>
 
-    <form id="input-form" style="display: none;">
-      <input type="text" id="input1" placeholder="Jogador 1..." autocomplete="off" />
-      <input type="text" id="input2" placeholder="Jogador 2..." autocomplete="off" />
+    <div id="name-inputs">
+      <input type="text" id="name1" placeholder="Nome do Jogador 1">
+      <input type="text" id="name2" placeholder="Nome do Jogador 2">
+      <button onclick="startGame()">Começar</button>
+    </div>
+
+    <form id="input-form" style="display:none;">
+      <input type="text" id="input1" placeholder="Jogador 1..." autocomplete="off">
+      <input type="text" id="input2" placeholder="Jogador 2..." autocomplete="off">
       <button type="submit">Enviar</button>
     </form>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
