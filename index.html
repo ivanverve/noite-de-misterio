@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Noite de Mistério</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <div id="container">
+  <div class="container">
     <h1>Noite de Mistério</h1>
-    <div id="story"></div>
-
+    <div id="chat-box" class="chat-box"></div>
     <form id="input-form">
-      <div id="name-inputs">
-        <input type="text" id="player1-name" placeholder="Nome do Jogador 1" autocomplete="off" />
-        <button type="submit">Enviar</button>
+      <div id="input-nomes">
+        <input type="text" id="jogador1" name="jogador1" placeholder="Jogador 1" required />
+        <input type="text" id="jogador2" name="jogador2" placeholder="Jogador 2" required />
       </div>
-      <div id="player-inputs" style="display: none">
-        <input type="text" id="input1" placeholder="..." autocomplete="off" />
-        <input type="text" id="input2" placeholder="..." autocomplete="off" />
-        <button type="submit">Enviar</button>
+      <div id="input-comandos" style="display: none;">
+        <input type="text" id="resposta1" placeholder="" />
+        <input type="text" id="resposta2" placeholder="" />
       </div>
+      <button type="submit">Enviar</button>
     </form>
   </div>
   <script src="script.js"></script>
