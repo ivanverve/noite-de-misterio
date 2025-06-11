@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -9,16 +9,11 @@
 <body>
   <div class="container">
     <h1>Noite de Mistério</h1>
-    <div id="chat-box" class="chat-box"></div>
-    <form id="input-form">
-      <div id="input-nomes">
-        <input type="text" id="jogador1" name="jogador1" placeholder="Jogador 1" required />
-        <input type="text" id="jogador2" name="jogador2" placeholder="Jogador 2" required />
-      </div>
-      <div id="input-comandos" style="display: none;">
-        <input type="text" id="resposta1" placeholder="" />
-        <input type="text" id="resposta2" placeholder="" />
-      </div>
+    <div id="chat" class="chat-box">
+      <p><span class="narrador">🤖 Narrador:</span> Bem-vindos à <strong>Noite de Mistério</strong>. A escuridão se aproxima, e as sombras ganham vida... Mas antes de revelarmos os segredos ocultos desta noite, diga-me... Qual o seu nome, viajante?</p>
+    </div>
+    <form id="form">
+      <input type="text" id="mensagem" placeholder="Digite seu comando..." autocomplete="off"/>
       <button type="submit">Enviar</button>
     </form>
   </div>
