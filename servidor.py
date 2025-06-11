@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 @app.route("/api/chat", methods=["POST"])
 def chat():
@@ -17,20 +17,26 @@ def chat():
         return jsonify({"resposta": "Mensagem vazia recebida."}), 400
 
     try:
-        resposta = openai.ChatCompletion.create(
+        resposta = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "Você é um narrador de uma história de mistério envolvente e interativa."},
-                {"role": "user", "content": mensagem_usuario}
+                {
+                    "role": "system",
+                    "content": "Você é um narrador misterioso e envolvente. Conduza os jogadores com suspense e criatividade."
+                },
+                {
+                    "role": "user",
+                    "content": mensagem_usuario
+                }
             ],
             max_tokens=400
         )
 
-        texto_resposta = resposta["choices"][0]["message"]["content"]
+        texto_resposta = resposta.choices[0].message.content
         return jsonify({"resposta": texto_resposta})
 
     except Exception as e:
-        return jsonify({"resposta": f"Ocorreu um erro no servidor: {str(e)}"}), 500
+        return jsonify({"resposta": f"Erro interno do servidor: {str(e)}"}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
