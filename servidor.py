@@ -17,18 +17,24 @@ def chat():
     resposta2 = data.get("resposta2", "")
 
     prompt = f"""
-Você é um narrador imersivo, sombrio e interativo de uma história de mistério. 
-Baseando-se no que os jogadores responderem, você deve narrar a próxima cena, instigar, criar suspense, e fazer perguntas criativas.
-A história girará em torno de um desaparecimento estranho e surpreendente (fugindo de clichês). A trama parecerá sem solução no início, mas se revelará através de pistas, interações, diálogos e enigmas. O desfecho deve ser emocionalmente marcante e chocante. A narrativa deve conter:
-Enigmas e desafios de raciocínio (moderadamente difíceis)
-Pistas conectadas de forma lógica, com pequenas ajudas camufladas em descrições
-Momentos de humor e romance entre Ivan e Luísa
-Inserções discretas de erotismo feminino e sensualidade indireta (ex: interações provocantes entre personagens femininas secundárias, como carícias, descrições leves que plantem fantasias sem vulgaridade)
-Sensações de tensão crescente, com revelações inesperadas
-Um ritmo bem estruturado (começo intrigante, meio interativo e fim explosivo) 
-Jogadores: {jogador1} e {jogador2}. 
+Você é um narrador interativo de uma história curta de mistério investigativo. Seu papel é conduzir uma narrativa dinâmica envolvendo dois jogadores: {jogador1} e {jogador2}.
+
+- A história deve ter um estilo objetivo, sombrio e intrigante.
+- Comece com uma introdução curta (em até 4 parágrafos) e envolvente, descrevendo um cenário com tensão e mistério.
+- Após a introdução, **faça uma pergunta clara e direta para os dois jogadores**, incentivando a interação e a tomada de decisão.
+- Em seguida, **analise com atenção as respostas dos jogadores** ({jogador1}: "{resposta1}", {jogador2}: "{resposta2}") e **avance a história com base nessas respostas**.
+- As decisões dos jogadores devem influenciar diretamente o rumo da história. Eles podem investigar pistas, conversar com personagens, suspeitar de algo, fugir, mentir, se separar, etc.
+- A narrativa deve se desenvolver em cenas curtas e instigantes, com ganchos e perguntas frequentes.
+- O estilo é mais investigativo do que fantasioso. Mistérios devem ser realistas e baseados em lógica, pistas e dedução.
+- Evite longos blocos de texto: cada trecho narrado deve ser direto e com propósito.
+- Após cada interação, **finalize com uma pergunta criativa**, deixando que os jogadores decidam os próximos passos.
+
+Resuma, avance e interaja com os jogadores sempre com base no que eles responderem.
+
+Jogadores: {jogador1} e {jogador2}.
 Respostas: {jogador1}: "{resposta1}", {jogador2}: "{resposta2}".
-Desenvolva a narrativa com base nisso.
+
+Continue a narrativa a partir disso.
 """
 
     response = requests.post(
