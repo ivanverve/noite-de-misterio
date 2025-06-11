@@ -15,46 +15,56 @@ document.getElementById("input-form").addEventListener("submit", async function 
   const input1 = document.getElementById("user-input-1") || document.getElementById("user-input");
   const input2 = document.getElementById("user-input-2");
 
-  if (etapa === 0 && input1.value.trim()) {
+  // Etapa 0: primeiro nome
+  if (etapa === 0 && input1 && input1.value.trim()) {
     jogadores[0] = input1.value.trim();
     addToStory(`🧍 ${jogadores[0]}: ${input1.value}`);
-    etapa = 1;
     input1.value = "";
-    input1.placeholder = "";
+    etapa = 1;
     addToStory(`🤖 Narrador: Muito bem, ${jogadores[0]}. E quem é essa figura misteriosa ao seu lado? Diga-me, qual o seu nome?`);
     return;
   }
 
-  if (etapa === 1 && input1.value.trim()) {
+  // Etapa 1: segundo nome
+  if (etapa === 1 && input1 && input1.value.trim()) {
     jogadores[1] = input1.value.trim();
     addToStory(`🧍 ${jogadores[1]}: ${input1.value}`);
     etapa = 2;
     criarCamposDuplos();
-    addToStory(`🤖 Narrador: Então estamos completos. ${jogadores[0]} e ${jogadores[1]}, preparem-se. A noite está apenas começando...`);
+    addToStory(`🤖 Narrador: ${jogadores[0]} e ${jogadores[1]}, o jogo começou... Sigam suas intuições. Há algo escondido nas sombras desta noite.`);
     return;
   }
 
-  const mensagens = [];
-  if (input1 && input1.value.trim()) {
-    mensagens.push({ jogador: jogadores[0], texto: input1.value.trim() });
-    input1.value = "";
-  }
+  // Etapa 2: jogo em andamento
+  if (etapa === 2) {
+    const mensagens = [];
 
-  if (input2 && input2.value.trim()) {
-    mensagens.push({ jogador: jogadores[1], texto: input2.value.trim() });
-    input2.value = "";
-  }
+    if (input1 && input1.value.trim()) {
+      mensagens.push({ jogador: jogadores[0], texto: input1.value.trim() });
+      input1.value = "";
+    }
 
-  for (const msg of mensagens) {
-    addToStory(`🧍 ${msg.jogador}: ${msg.texto}`);
-    const resposta = await fetch("https://misterio.onrender.com/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: msg.texto })
-    });
+    if (input2 && input2.value.trim()) {
+      mensagens.push({ jogador: jogadores[1], texto: input2.value.trim() });
+      input2.value = "";
+    }
 
-    const data = await resposta.json();
-    addToStory("🤖 Narrador: " + data.reply);
+    for (const msg of mensagens) {
+      addToStory(`🧍 ${msg.jogador}: ${msg.texto}`);
+
+      try {
+        const resposta = await fetch("https://misterio.onrender.com/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: msg.texto })
+        });
+
+        const data = await resposta.json();
+        addToStory("🤖 Narrador: " + data.reply);
+      } catch (err) {
+        addToStory("⚠️ Falha ao se comunicar com o narrador.");
+      }
+    }
   }
 });
 
@@ -72,4 +82,3 @@ function criarCamposDuplos() {
     <button type="submit">Enviar</button>
   `;
 }
-
