@@ -1,19 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Noite de Mistério</title>
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
+  <div id="container">
     <h1>Noite de Mistério</h1>
-    <div id="chat" class="chat-box">
-      <p><span class="narrador">🤖 Narrador:</span> Bem-vindos à <strong>Noite de Mistério</strong>. A escuridão se aproxima, e as sombras ganham vida... Mas antes de revelarmos os segredos ocultos desta noite, diga-me... Qual o seu nome, viajante?</p>
-    </div>
-    <form id="form">
-      <input type="text" id="mensagem" placeholder="Digite seu comando..." autocomplete="off"/>
+    <div id="story"></div>
+    <form id="input-form">
+      <input type="text" id="user-input" placeholder="Digite seu comando..." autocomplete="off" />
       <button type="submit">Enviar</button>
     </form>
   </div>
