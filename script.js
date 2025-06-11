@@ -1,17 +1,14 @@
 let jogadores = [];
 let etapa = 0;
 
-const form = document.getElementById("input-form");
-const input1 = document.getElementById("player1-input");
-const input2 = document.getElementById("player2-input");
-
-form.addEventListener("submit", async function (e) {
+document.getElementById("input-form").addEventListener("submit", async function (e) {
   e.preventDefault();
 
+  const input1 = document.getElementById("player1-input");
+  const input2 = document.getElementById("player2-input");
   const msg1 = input1.value.trim();
   const msg2 = input2.value.trim();
 
-  // Etapa de coleta de nomes
   if (etapa === 0 && msg1) {
     jogadores.push(msg1);
     addToStory(`🧍 ${msg1}: ${msg1}`);
@@ -32,7 +29,6 @@ form.addEventListener("submit", async function (e) {
     return;
   }
 
-  // Etapa do jogo
   if (etapa >= 1) {
     const comandos = [];
 
