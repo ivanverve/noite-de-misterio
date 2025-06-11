@@ -1,71 +1,40 @@
-const form = document.getElementById("input-form");
-const chatBox = document.getElementById("chat-box");
-const nomeInputs = document.getElementById("input-nomes");
-const comandoInputs = document.getElementById("input-comandos");
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("form");
+  const mensagemInput = document.getElementById("mensagem");
+  const chat = document.getElementById("chat");
 
-let jogadores = [];
-let etapa = 0;
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const mensagem = mensagemInput.value.trim();
+    if (mensagem === "") return;
 
-function adicionarMensagem(personagem, mensagem) {
-  const msg = document.createElement("p");
-  msg.innerHTML = `<span>${personagem}:</span> ${mensagem}`;
-  chatBox.appendChild(msg);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
+    adicionarMensagem("👤 Você", mensagem);
+    mensagemInput.value = "";
+    
+    try {
+      const resposta = await fetch("https://misterio.onrender.com/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ mensagem })
+      });
 
-function enviarParaServidor(msgJogador1, msgJogador2) {
-  fetch("https://misterio.onrender.com/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      jogadores,
-      mensagens: [
-        { jogador: jogadores[0], mensagem: msgJogador1 },
-        { jogador: jogadores[1], mensagem: msgJogador2 }
-      ]
-    })
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      adicionarMensagem("🤖 Narrador", data.reply);
-    })
-    .catch((err) => {
-      console.error("Erro:", err);
-      adicionarMensagem("Erro", "Não foi possível se comunicar com o servidor.");
-    });
-}
+      const dados = await resposta.json();
+      adicionarMensagem("🤖 Narrador", dados.resposta);
+    } catch (erro) {
+      adicionarMensagem("🤖 Narrador", "Ocorreu um erro ao se comunicar com o servidor.");
+    }
+  });
 
-form.addEventListener("submit", function (e) {
-  e.preventDefault();
-
-  if (etapa === 0) {
-    const nome1 = document.getElementById("jogador1").value.trim();
-    const nome2 = document.getElementById("jogador2").value.trim();
-    if (!nome1 || !nome2) return;
-
-    jogadores = [nome1, nome2];
-    nomeInputs.style.display = "none";
-    comandoInputs.style.display = "flex";
-    document.getElementById("resposta1").placeholder = `${nome1}`;
-    document.getElementById("resposta2").placeholder = `${nome2}`;
-    adicionarMensagem("🤖 Narrador", `Muito bem, ${nome1} e ${nome2}, o jogo começou... Sigam suas intuições.`);
-    etapa++;
-  } else {
-    const msg1 = document.getElementById("resposta1").value.trim();
-    const msg2 = document.getElementById("resposta2").value.trim();
-    if (!msg1 && !msg2) return;
-
-    if (msg1) adicionarMensagem(`🧍 ${jogadores[0]}`, msg1);
-    if (msg2) adicionarMensagem(`🧍‍♀️ ${jogadores[1]}`, msg2);
-
-    enviarParaServidor(msg1, msg2);
-
-    document.getElementById("resposta1").value = "";
-    document.getElementById("resposta2").value = "";
+  function adicionarMensagem(origem, texto) {
+    const paragrafo = document.createElement("p");
+    const span = document.createElement("span");
+    span.className = origem.includes("Narrador") ? "narrador" : "usuario";
+    span.textContent = `${origem}: `;
+    paragrafo.appendChild(span);
+    paragrafo.append(texto);
+    chat.appendChild(paragrafo);
+    chat.scrollTop = chat.scrollHeight;
   }
 });
-
-// Mensagem inicial automática
-window.onload = () => {
-  adicionarMensagem("🤖 Narrador", "Bem-vindos à *Noite de Mistério*. A escuridão se aproxima, e as sombras ganham vida... Mas antes de revelarmos os segredos ocultos desta noite, diga-me... Qual o seu nome, viajante?");
-};
