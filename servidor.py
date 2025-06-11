@@ -6,32 +6,31 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 @app.route("/api/chat", methods=["POST"])
 def chat():
-    dados = request.get_json()
-    mensagem = dados.get("mensagem")
+    data = request.json
+    mensagem_usuario = data.get("mensagem")
 
-    if not mensagem:
-        return jsonify({"resposta": "Nenhuma mensagem recebida."}), 400
+    if not mensagem_usuario:
+        return jsonify({"resposta": "Mensagem vazia recebida."}), 400
 
     try:
         resposta = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "Você é o narrador de um jogo de mistério. Responda sempre como se estivesse narrando um RPG sombrio e envolvente."},
-                {"role": "user", "content": mensagem}
+                {"role": "system", "content": "Você é um narrador de uma história de mistério envolvente e interativa."},
+                {"role": "user", "content": mensagem_usuario}
             ],
-            max_tokens=500,
-            temperature=0.9
+            max_tokens=400
         )
 
-        mensagem_resposta = resposta.choices[0].message.content.strip()
-        return jsonify({"resposta": mensagem_resposta})
+        texto_resposta = resposta["choices"][0]["message"]["content"]
+        return jsonify({"resposta": texto_resposta})
 
     except Exception as e:
-        return jsonify({"resposta": f"Erro: {str(e)}"}), 500
+        return jsonify({"resposta": f"Ocorreu um erro no servidor: {str(e)}"}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    app.run(debug=True)
