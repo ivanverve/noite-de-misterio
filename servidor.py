@@ -1,39 +1,32 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import os
-import requests
-
-app = Flask(__name__)
-CORS(app)
-
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-
-@app.route('/api/chat', methods=['POST'])
+@app.route("/api/chat", methods=["POST"])
 def chat():
-    data = request.get_json()
-    jogador1 = data.get('jogador1', 'Jogador 1')
-    jogador2 = data.get('jogador2', 'Jogador 2')
-    msg1 = data.get('mensagem1', '')
-    msg2 = data.get('mensagem2', '')
+    data = request.json
+    jogadores = data.get("jogadores", ["Jogador 1", "Jogador 2"])
+    mensagens = data.get("mensagens", [])
 
-    mensagens = [
-        {"role": "system", "content": f"Você é um narrador de RPG psicológico e sombrio, conduzindo uma história interativa com dois jogadores: {jogador1} e {jogador2}. Combine as ações deles e continue a história de forma envolvente, misteriosa e densa."},
-        {"role": "user", "content": f"{jogador1}: {msg1}\n{jogador2}: {msg2}"}
-    ]
+    prompt = (
+        f"Você é um narrador de um jogo de mistério psicológico, sensual, interativo e envolvente. "
+        f"Os jogadores são {jogadores[0]} e {jogadores[1]}. "
+        f"A história deve avançar a cada turno considerando as ações combinadas dos dois. "
+        f"Responda como o narrador, em tom imersivo, em terceira pessoa, guiando-os com suspense. "
+        f"Aqui estão as ações mais recentes:\n"
+    )
+
+    for msg in mensagens:
+        prompt += f"{msg['jogador']}: {msg['mensagem']}\n"
 
     response = requests.post(
         "https://api.openai.com/v1/chat/completions",
         headers={
             "Authorization": f"Bearer {OPENAI_API_KEY}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         },
         json={
             "model": "gpt-4o",
-            "messages": mensagens,
-            "temperature": 0.9
-        }
+            "messages": [{"role": "system", "content": prompt}],
+            "temperature": 0.85,
+        },
     )
 
-    resposta = response.json()
-    texto = resposta['choices'][0]['message']['content']
-    return jsonify({"reply": texto})
+    result = response.json()
+    return jsonify({"reply": result["choices"][0]["message"]["content"]})
