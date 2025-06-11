@@ -10,36 +10,45 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 @app.route("/api/chat", methods=["POST"])
 def chat():
-    data = request.json
-    input1 = data.get("input1", "")
-    input2 = data.get("input2", "")
-    jogador1 = data.get("jogador1", "Jogador 1")
-    jogador2 = data.get("jogador2", "Jogador 2")
+    data = request.get_json()
+    jogador1 = data.get("jogador1", "")
+    jogador2 = data.get("jogador2", "")
+    resposta1 = data.get("resposta1", "")
+    resposta2 = data.get("resposta2", "")
 
-    prompt = (
-        f"{jogador1} respondeu: {input1 or '[em silêncio]'}.\n"
-        f"{jogador2} respondeu: {input2 or '[em silêncio]'}.\n"
-        "Com base nessas ações, continue a história de mistério de forma envolvente:"
-    )
+    prompt = f"""
+Você é um narrador imersivo, sombrio e interativo de uma história de mistério. 
+Baseando-se no que os jogadores responderem, você deve narrar a próxima cena, instigar, criar suspense, e fazer perguntas criativas.
+A história girará em torno de um desaparecimento estranho e surpreendente (fugindo de clichês). A trama parecerá sem solução no início, mas se revelará através de pistas, interações, diálogos e enigmas. O desfecho deve ser emocionalmente marcante e chocante. A narrativa deve conter:
+Enigmas e desafios de raciocínio (moderadamente difíceis)
+Pistas conectadas de forma lógica, com pequenas ajudas camufladas em descrições
+Momentos de humor e romance entre Ivan e Luísa
+Inserções discretas de erotismo feminino e sensualidade indireta (ex: interações provocantes entre personagens femininas secundárias, como carícias, descrições leves que plantem fantasias sem vulgaridade)
+Sensações de tensão crescente, com revelações inesperadas
+Um ritmo bem estruturado (começo intrigante, meio interativo e fim explosivo) 
+Jogadores: {jogador1} e {jogador2}. 
+Respostas: {jogador1}: "{resposta1}", {jogador2}: "{resposta2}".
+Desenvolva a narrativa com base nisso.
+"""
 
     response = requests.post(
-        "https://api.openai.com/v1/chat/completions",
+        'https://api.openai.com/v1/chat/completions',
         headers={
-            "Authorization": f"Bearer {OPENAI_API_KEY}",
-            "Content-Type": "application/json"
+            'Authorization': f'Bearer {OPENAI_API_KEY}',
+            'Content-Type': 'application/json'
         },
         json={
             "model": "gpt-4o",
             "messages": [
-                {"role": "system", "content": "Você é um narrador de um jogo de mistério psicológico e interativo. Continue a história com base nas ações dos jogadores, mantendo suspense e imersão."},
+                {"role": "system", "content": "Você é um narrador envolvente de uma história misteriosa com dois jogadores."},
                 {"role": "user", "content": prompt}
             ],
-            "temperature": 0.8
+            "temperature": 0.9
         }
     )
 
-    result = response.json()
-    reply = result["choices"][0]["message"]["content"]
+    data = response.json()
+    reply = data['choices'][0]['message']['content']
     return jsonify({"reply": reply})
 
 if __name__ == "__main__":
