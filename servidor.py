@@ -6,37 +6,30 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
-@app.route("/api/chat", methods=["POST"])
+@app.route('/api/chat', methods=['POST'])
 def chat():
-    data = request.json
-    mensagem_usuario = data.get("mensagem")
+    user_input = request.json.get('message')
 
-    if not mensagem_usuario:
-        return jsonify({"resposta": "Mensagem vazia recebida."}), 400
-
-    try:
-        resposta = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "Você é um narrador misterioso e envolvente. Conduza os jogadores com suspense e criatividade."
-                },
-                {
-                    "role": "user",
-                    "content": mensagem_usuario
-                }
+    response = requests.post(
+        'https://api.openai.com/v1/chat/completions',
+        headers={
+            'Authorization': f'Bearer {OPENAI_API_KEY}',
+            'Content-Type': 'application/json'
+        },
+        json={
+            'model': 'gpt-4o',
+            'messages': [
+                {'role': 'system', 'content': 'Você é um narrador de um jogo de mistério psicológico, sensual, interativo e envolvente. Conduza a história com clima, descrição, tensão e inteligência. Interaja com os jogadores como um mestre de RPG.'},
+                {'role': 'user', 'content': user_input}
             ],
-            max_tokens=400
-        )
+            'temperature': 0.8
+        }
+    )
 
-        texto_resposta = resposta.choices[0].message.content
-        return jsonify({"resposta": texto_resposta})
+    result = response.json()
+    return jsonify({'reply': result['choices'][0]['message']['content']})
 
-    except Exception as e:
-        return jsonify({"resposta": f"Erro interno do servidor: {str(e)}"}), 500
-
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=5000)
