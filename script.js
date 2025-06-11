@@ -1,40 +1,24 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("form");
-  const mensagemInput = document.getElementById("mensagem");
-  const chat = document.getElementById("chat");
+document.getElementById("input-form").addEventListener("submit", async function (e) {
+  e.preventDefault();
+  const input = document.getElementById("user-input");
+  const message = input.value.trim();
+  if (!message) return;
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const mensagem = mensagemInput.value.trim();
-    if (mensagem === "") return;
+  addToStory("👤 Você: " + message);
+  input.value = "";
 
-    adicionarMensagem("👤 Você", mensagem);
-    mensagemInput.value = "";
-    
-    try {
-      const resposta = await fetch("https://misterio.onrender.com/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ mensagem })
-      });
-
-      const dados = await resposta.json();
-      adicionarMensagem("🤖 Narrador", dados.resposta);
-    } catch (erro) {
-      adicionarMensagem("🤖 Narrador", "Ocorreu um erro ao se comunicar com o servidor.");
-    }
+  const response = await fetch("https://misterio.onrender.com/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message })
   });
 
-  function adicionarMensagem(origem, texto) {
-    const paragrafo = document.createElement("p");
-    const span = document.createElement("span");
-    span.className = origem.includes("Narrador") ? "narrador" : "usuario";
-    span.textContent = `${origem}: `;
-    paragrafo.appendChild(span);
-    paragrafo.append(texto);
-    chat.appendChild(paragrafo);
-    chat.scrollTop = chat.scrollHeight;
-  }
+  const data = await response.json();
+  addToStory("🤖 Narrador: " + data.reply);
 });
+
+function addToStory(text) {
+  const story = document.getElementById("story");
+  story.innerHTML += text + "\n\n";
+  story.scrollTop = story.scrollHeight;
+}
